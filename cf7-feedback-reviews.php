@@ -167,7 +167,7 @@ function cf7fr_render_reviews_page()
     echo '<div class="wrap"><h1>Feedback Reviews</h1>';
 
     if (empty($selected_form)) {
-        echo '<p>No form selected yet. Please go to <strong>Reviews → Settings</strong> and choose a Contact Form.</p></div>';
+        echo '<p>No Page selected yet. Please go to <strong>Reviews → Settings</strong> and choose a Feedback Page.</p></div>';
         return;
     }
 
@@ -181,13 +181,13 @@ function cf7fr_render_reviews_page()
         ON p.ID = m.post_id
     WHERE p.post_type = 'flamingo_inbound'
     AND m.meta_key = 'post_id'
-    AND m.meta_value = %d
+    AND CAST(m.meta_value AS UNSIGNED) = %d
     ORDER BY p.post_date DESC
 ", $selected_form));
 
 
     if (empty($messages)) {
-        echo '<p>No reviews found yet for the selected form.</p></div>';
+        echo '<p>No reviews found yet for the selected Page.</p></div>';
         return;
     }
 
