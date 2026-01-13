@@ -67,11 +67,11 @@ function cf7fr_register_admin_pages()
     // صفحة الإعدادات
     add_submenu_page(
         'cf7-feedback-reviews',
-        'Inbox',
-        'Inbox',
+        'CF7 Reviews Settings',
+        'Settings',
         'manage_options',
-        'cf7fr-inbox',
-        'cf7fr_render_inbox_page'
+        'cf7-reviews-settings',
+        'cf7fr_render_settings_page'
     );
 }
 // GitHub Auto Update
@@ -147,64 +147,6 @@ function cf7fr_render_settings_page()
     submit_button('Save Settings');
 
     echo '</form></div>';
-}
-
-function cf7fr_render_inbox_page()
-{
-    if (!current_user_can('manage_options')) {
-        return;
-    }
-
-    echo '<div class="wrap"><h1 class="cf7fr-title">Inbox</h1>';
-
-    // جلب كل رسائل Flamingo
-    $messages = get_posts([
-        'post_type' => 'flamingo_inbound',
-        'numberposts' => -1,
-        'orderby' => 'date',
-        'order' => 'DESC'
-    ]);
-
-    if (empty($messages)) {
-        echo '<p>No messages found.</p></div>';
-        return;
-    }
-
-    echo '<div class="cf7fr-inbox-wrapper">
-            <table class="cf7fr-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Subject</th>
-                        <th>Message</th>
-                        <th>Date</th>
-                        <th>View</th>
-                    </tr>
-                </thead>
-                <tbody>';
-
-    foreach ($messages as $msg) {
-        $meta = get_post_meta($msg->ID);
-
-        $name = $meta['_field_your-name'][0] ?? '—';
-        $email = $meta['_field_your-email'][0] ?? '—';
-        $subject = $meta['_field_subject'][0] ?? '—';
-        $body = $meta['_field_message'][0] ?? '—';
-        $date = $msg->post_date;
-
-        echo "
-        <tr>
-            <td><strong>" . esc_html($name) . "</strong></td>
-            <td><span class='cf7fr-badge'>" . esc_html($email) . "</span></td>
-            <td>" . esc_html($subject) . "</td>
-            <td class='cf7fr-message'>" . esc_html(wp_trim_words($body, 12)) . "</td>
-            <td>" . esc_html($date) . "</td>
-            <td><button class='cf7fr-view-btn' data-id='{$msg->ID}'>View</button></td>
-        </tr>";
-    }
-
-    echo '</tbody></table></div></div>';
 }
 
 /*
