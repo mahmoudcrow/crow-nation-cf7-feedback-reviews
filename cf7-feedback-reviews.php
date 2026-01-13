@@ -5,9 +5,15 @@ Plugin URI: https://github.com/mahmoudcrow/crow-nation-cf7-feedback-reviews
 Description: Display Contact Form 7 feedback submissions (stored via Flamingo) as modern review cards in the WordPress admin, with form selection and PNG download.
 Version: 1.0
 Author: Mahmoud Moustafa
-Author URI: https://github.com/mahmudmoustafa
+Author URI: https://github.com/mahmoudcrow
 */
+register_uninstall_hook(__FILE__, 'cf7fr_uninstall_cleanup');
 
+function cf7fr_uninstall_cleanup()
+{
+    delete_option('cf7_selected_form');
+}
+// Exit if accessed directly
 if (!defined('ABSPATH'))
     exit;
 
@@ -69,7 +75,24 @@ function cf7fr_register_admin_pages()
         'cf7fr_render_settings_page'
     );
 }
+// GitHub Auto Update
+add_action('init', function () {
+    if (!class_exists('Puc_v4_Factory')) {
+        require_once plugin_dir_path(__FILE__) . 'plugin-update-checker/plugin-update-checker.php';
+    }
 
+    $updateChecker = Puc_v4_Factory::buildUpdateChecker(
+        'https://github.com/mahmoudcrow/crow-nation-cf7-feedback-reviews/',
+        __FILE__,
+        'cf7-feedback-reviews'
+    );
+
+    // لو الريبو private
+    // $updateChecker->setAuthentication('YOUR_GITHUB_TOKEN');
+
+    // لو عايز تحدد فرع معين
+    $updateChecker->setBranch('main');
+});
 /*
 |--------------------------------------------------------------------------
 |  صفحة الإعدادات: اختيار الفورم
@@ -167,11 +190,15 @@ function cf7fr_render_reviews_page()
     $selected_form = intval($selected_form);
 
     $messages = $wpdb->get_results($wpdb->prepare("
-        SELECT * FROM {$wpdb->prefix}posts 
-        WHERE post_type = 'flamingo_inbound'
-        AND post_parent = %d
-        ORDER BY post_date DESC
-    ", $selected_form));
+    SELECT * FROM {$wpdb->prefix}posts 
+    WHERE post_type = 'flamingo_inbound'
+    AND ID IN (
+        SELECT post_id FROM {$wpdb->prefix}postmeta 
+        WHERE meta_key = '_flmail_form_id'
+        AND meta_value = %d
+    )
+    ORDER BY post_date DESC
+", $selected_form));
 
     if (empty($messages)) {
         echo '<p>No reviews found yet for the selected form.</p></div>';
@@ -341,5 +368,6 @@ add_action('admin_footer', function () {
             });
         })();
     </script>
+
     <?php
 });
