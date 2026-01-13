@@ -12,7 +12,21 @@ Author URI: https://github.com/mahmoudcrow
 |  تنبيهات لو الإضافات المطلوبة مش مفعّلة
 |--------------------------------------------------------------------------
 */
+if (!defined('ABSPATH')) {
+    exit;
+}
 
+// تحميل ملف الـ Activator
+require_once plugin_dir_path(__FILE__) . 'includes/class-cf7fr-activator.php';
+require_once plugin_dir_path(__FILE__) . 'includes/class-cf7fr-storage.php';
+CF7FR_Storage::init();
+require_once plugin_dir_path(__FILE__) . 'includes/class-cf7fr-admin-page.php';
+CF7FR_Admin_Page::init();
+require_once plugin_dir_path(__FILE__) . 'includes/class-cf7fr-settings.php';
+CF7FR_Settings::init();
+
+// Hook التفعيل
+register_activation_hook(__FILE__, ['CF7FR_Activator', 'activate']);
 add_action('admin_init', function () {
     // check Contact Form 7
     if (!is_plugin_active('contact-form-7/wp-contact-form-7.php')) {
@@ -351,6 +365,44 @@ add_action('flamingo_inbound_message_after_save', function ($message) {
     // نخزّنه في postmeta
     update_post_meta($msg_id, '_cf7fr_page_id', $page_id);
 
+});
+
+add_action('admin_enqueue_scripts', function ($hook) {
+    if ($hook === 'toplevel_page_cf7fr-reviews') {
+        wp_enqueue_style('cf7fr-admin', plugin_dir_url(__FILE__) . 'assets/css/admin.css');
+        wp_enqueue_script('cf7fr-admin', plugin_dir_url(__FILE__) . 'assets/js/admin.js', [], false, true);
+    }
+});
+
+add_action('admin_enqueue_scripts', function ($hook) {
+
+    // تحميل السكربتات في صفحة الريفيوهات فقط
+    if ($hook === 'toplevel_page_cf7fr-reviews') {
+
+        // تحميل مكتبة html2canvas
+        wp_enqueue_script(
+            'html2canvas',
+            'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
+            [],
+            '1.4.1',
+            true
+        );
+
+        // تحميل سكربت الإضافة
+        wp_enqueue_script(
+            'cf7fr-admin',
+            plugin_dir_url(__FILE__) . 'assets/js/admin.js',
+            ['html2canvas'], // تحميل admin.js بعد html2canvas
+            false,
+            true
+        );
+
+        // تحميل CSS
+        wp_enqueue_style(
+            'cf7fr-admin',
+            plugin_dir_url(__FILE__) . 'assets/css/admin.css'
+        );
+    }
 });
 
 add_action('admin_footer', function () {

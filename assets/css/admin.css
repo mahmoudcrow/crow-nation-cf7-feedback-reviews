@@ -1,0 +1,17 @@
+.cf7fr-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.cf7fr-card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.cf7fr-card .stars {
+    color: #f7b500;
+    font-size: 20px;
+}
