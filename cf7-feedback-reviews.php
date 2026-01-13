@@ -1,9 +1,11 @@
 <?php
 /*
-Plugin Name: CF7 Feedback Reviews
+Plugin Name: Crow Nation CF7 Feedback Reviews
+Plugin URI: https://github.com/mahmoudcrow/crow-nation-cf7-feedback-reviews
 Description: Display Contact Form 7 feedback submissions (stored via Flamingo) as modern review cards in the WordPress admin, with form selection and PNG download.
 Version: 1.0
-Author: Mahmoud
+Author: Mahmoud Moustafa
+Author URI: https://github.com/mahmudmoustafa
 */
 
 if (!defined('ABSPATH'))
