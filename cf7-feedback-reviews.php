@@ -106,8 +106,8 @@ function cf7fr_render_settings_page()
 
     echo '<div class="wrap"><h1>CF7 Reviews Settings</h1>';
 
-    if (empty($forms)) {
-        echo '<p>No Contact Form 7 forms found. Please create a form first.</p></div>';
+    if (empty($pages)) {
+        echo '<p>No Pages found. Please create a form first and insert it to page.</p></div>';
         return;
     }
 
