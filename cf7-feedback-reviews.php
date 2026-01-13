@@ -97,12 +97,11 @@ function cf7fr_render_settings_page()
     }
 
     // جلب الفورمات من Contact Form 7
-    $forms = get_posts([
-        'post_type' => 'wpcf7_contact_form',
-        'numberposts' => -1,
-        'orderby' => 'title',
-        'order' => 'ASC',
+    $pages = get_pages([
+        'sort_column' => 'post_title',
+        'sort_order' => 'ASC'
     ]);
+
     $selected = get_option('cf7_selected_form');
 
     echo '<div class="wrap"><h1>CF7 Reviews Settings</h1>';
@@ -120,10 +119,11 @@ function cf7fr_render_settings_page()
                 <th scope="row"><label for="cf7_selected_form">Select Contact Form</label></th>
                 <td>
                     <select name="cf7_selected_form" id="cf7_selected_form">';
-    foreach ($forms as $form) {
-        $sel = ($selected == $form->ID) ? 'selected' : '';
-        echo "<option value='{$form->ID}' $sel>{$form->post_title}</option>";
+    foreach ($pages as $page) {
+        $sel = ($selected == $page->ID) ? 'selected' : '';
+        echo "<option value='{$page->ID}' $sel>{$page->post_title}</option>";
     }
+
     echo '</select>
                     <p class="description">Choose which Contact Form 7 form’s submissions to display as reviews.</p>
                 </td>
@@ -177,15 +177,14 @@ function cf7fr_render_reviews_page()
     $messages = $wpdb->get_results($wpdb->prepare("
     SELECT p.* 
     FROM {$wpdb->prefix}posts p
-    LEFT JOIN {$wpdb->prefix}postmeta m 
+    INNER JOIN {$wpdb->prefix}postmeta m 
         ON p.ID = m.post_id
     WHERE p.post_type = 'flamingo_inbound'
-    AND (
-        p.post_parent = %d
-        OR (m.meta_key = 'post_id' AND m.meta_value = %d)
-    )
+    AND m.meta_key = 'post_id'
+    AND m.meta_value = %d
     ORDER BY p.post_date DESC
-", $selected_form, $selected_form));
+", $selected_form));
+
 
     if (empty($messages)) {
         echo '<p>No reviews found yet for the selected form.</p></div>';
