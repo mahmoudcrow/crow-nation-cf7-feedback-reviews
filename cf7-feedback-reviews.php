@@ -7,7 +7,6 @@ Version: 1.0
 Author: Mahmoud Moustafa
 Author URI: https://github.com/mahmoudcrow
 */
-register_uninstall_hook(__FILE__, 'cf7fr_uninstall_cleanup');
 
 function cf7fr_uninstall_cleanup()
 {
@@ -77,21 +76,19 @@ function cf7fr_register_admin_pages()
 }
 // GitHub Auto Update
 add_action('init', function () {
-    if (!class_exists('Puc_v4_Factory')) {
-        require_once plugin_dir_path(__FILE__) . 'plugin-update-checker/plugin-update-checker.php';
+    $update_lib = plugin_dir_path(__FILE__) . 'plugin-update-checker/plugin-update-checker.php';
+
+    if (file_exists($update_lib)) {
+        require_once $update_lib;
+
+        $updateChecker = Puc_v4_Factory::buildUpdateChecker(
+            'https://github.com/mahmoudcrow/crow-nation-cf7-feedback-reviews/',
+            __FILE__,
+            'cf7-feedback-reviews'
+        );
+
+        $updateChecker->setBranch('main');
     }
-
-    $updateChecker = Puc_v4_Factory::buildUpdateChecker(
-        'https://github.com/mahmoudcrow/crow-nation-cf7-feedback-reviews/',
-        __FILE__,
-        'cf7-feedback-reviews'
-    );
-
-    // لو الريبو private
-    // $updateChecker->setAuthentication('YOUR_GITHUB_TOKEN');
-
-    // لو عايز تحدد فرع معين
-    $updateChecker->setBranch('main');
 });
 /*
 |--------------------------------------------------------------------------
