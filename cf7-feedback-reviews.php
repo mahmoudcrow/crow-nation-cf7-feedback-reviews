@@ -180,7 +180,7 @@ function cf7fr_render_reviews_page()
     INNER JOIN {$wpdb->prefix}postmeta m 
         ON p.ID = m.post_id
     WHERE p.post_type = 'flamingo_inbound'
-    AND m.meta_key = '_field_page-id'
+    AND m.meta_key = '_cf7fr_page_id'
     AND CAST(m.meta_value AS UNSIGNED) = %d
     ORDER BY p.post_date DESC
 ", $selected_form));
@@ -322,6 +322,35 @@ add_action('admin_enqueue_scripts', function ($hook) {
         '1.4.1',
         true
     );
+});
+
+add_action('flamingo_inbound_message_after_save', function ($message) {
+
+    // ID الرسالة
+    $msg_id = $message->id;
+
+    // نولّد كود أوتو جينيريتد
+    $unique_code = wp_generate_uuid4();
+
+    // نخزّنه في postmeta
+    update_post_meta($msg_id, '_cf7fr_auto_code', $unique_code);
+
+});
+
+add_action('flamingo_inbound_message_after_save', function ($message) {
+
+    // ID الرسالة
+    $msg_id = $message->id;
+
+    // URL اللي Flamingo سجّله
+    $url = isset($message->fields['url']) ? $message->fields['url'] : '';
+
+    // نجيب Page ID من الـ URL
+    $page_id = url_to_postid($url);
+
+    // نخزّنه في postmeta
+    update_post_meta($msg_id, '_cf7fr_page_id', $page_id);
+
 });
 
 add_action('admin_footer', function () {
